@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+      integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/index.css" />
+    <title>Play Music</title>
+  </head>
+  <body>
+    <div class="player">
+      <!-- Dashboard -->
+      <div class="dashboard">
+        <!-- Header -->
+        <header>
+          <h4>Syx Doan</h4>  
+          <h2>String 57th & 9th</h2>
+        </header>
+
+        <!-- CD -->
+        <div class="cd">
+          <div
+            class="cd-thumb"
+            style="
+              background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg');
+            "
+          ></div>
+        </div>
+
+        <!-- Control -->
+        <div class="control">
+          <div class="btn btn-repeat">
+            <i class="fas fa-redo"></i>
+          </div>
+          <div class="btn btn-prev">
+            <i class="fas fa-step-backward"></i>
+          </div>
+          <div class="btn btn-toggle-play">
+            <i class="fas fa-pause icon-pause"></i>
+            <i class="fas fa-play icon-play"></i>
+          </div>
+          <div class="btn btn-next">
+            <i class="fas fa-step-forward"></i>
+          </div>
+          <div class="btn btn-random">
+            <i class="fas fa-random"></i>
+          </div>
+        </div>
+
+        <input
+          id="progress"
+          class="progress"
+          type="range"
+          value="0"
+          step="1"
+          min="0"
+          max="100"
+        />
+
+        <audio id="audio" src=""></audio>
+      </div>
+
+      <!-- Playlist -->
+      <div class="playlist">
+        <div class="song">
+          <div
+            class="thumb"
+            style="
+              background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg');
+            "
+          ></div>
+          <div class="body">
+            <h3 class="title">Music name</h3>
+            <p class="author">Singer</p>
+          </div>
+          <div class="option">
+            <i class="fas fa-ellipsis-h"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const $ = document.querySelector.bind(document);
+      const $$ = document.querySelectorAll.bind(document);
+
+      const PLAYER_STRORAGE_KEY= 'syx'
+
+      const playList = $(".playlist");
+      const cd = $(".cd");
+      const heading = $("header h2");
+      const cdThumb = $(".cd-thumb");
+      const audio = $("#audio");
+
+      const player = $(".player");
+      const playBtn = $(".btn-toggle-play");
+
+      const progerss = $("#progress");
+      const nextBtn = $(".btn-next");
+      const prevBtn = $(".btn-prev");
+
+      const randomBtn = $(".btn-random");
+      const repeatBtn = $(".btn-repeat");
+      //list song
+      const app = {
+        currentIndex: 0,
+        isPlaying: false,
+        isRandom: false,
+        isRepeat: false,
+        config: JSON.parse(localStorage.getItem(PLAYER_STRORAGE_KEY)) || {},
+
+        songs: [
+          {
+            name: "3107",
+            singer: "Syx Doan",
+            path: "./assets/music/3107full.mp4",
+            image: "./assets/img/c.jpg",
+          },
+          {
+            name: "Anh Vẫn Ở Đây",
+            singer: "Syx Doan",
+            path: "./assets/music/anhvanoday.mp4",
+            image: "./assets/img/a.jpg",
+          },
+          {
+            name: "Bao Tiền Một Mớ Bình Yên",
+            singer: "Syx Doan",
+            path: "./assets/music/baotienmotmobinhyen.mp4",
+            image: "./assets/img/1.jpg",
+          },
+          {
+            name: "Bông Hoa Đẹp Nhất",
+            singer: "Syx Doan",
+            path: "./assets/music/bonghoadepnhat.mp4",
+            image: "./assets/img/2.jpg",
+          },
+          {
+            name: "Chuyện Đôi TA",
+            singer: "Syx Doan",
+            path: "./assets/music/chuyendoita.mp4",
+            image: "./assets/img/3.jpg",
+          },
+          {
+            name: "Có Không Cần, Cần Không Có ",
+            singer: "Syx Doan",
+            path: "./assets/music/cokhongcancankhongco.mp4",
+            image: "./assets/img/4.jpg",
+          },
+          {
+            name: "Mãi Mãi Không Phải Anh",
+            singer: "Syx Doan",
+            path: "./assets/music/maimaikhongphaianh.mp4",
+            image: "./assets/img/back.jpg",
+          },
+          {
+            name: "Một Bước Yêu Dặm Vạn Đau",
+            singer: "Syx Doan",
+            path: "./assets/music/motbuocyeudamvandau.mp4",
+            image: "./assets/img/5.jpg",
+          },
+          {
+            name: "Tệ Thật Anh Lại Nhớ Em Rồi",
+            singer: "Syx Doan",
+            path: "./assets/music/tethaanhlainhoemroi.mp4",
+            image: "./assets/img/Syx_6.jpg",
+          },
+          {
+            name: "Về Bên Anh",
+            singer: "Syx Doan",
+            path: "./assets/music/vebenanh.mp4",
+            image: "./assets/img/Syx_41.jpg",
+          },
+          {
+            name: "Xĩn Lỗi Vì Đã Yêu",
+            singer: "Syx Doan",
+            path: "./assets/music/xinloividayeu.mp4",
+            image: "./assets/img/Syx_52.jpg",
+          },
+        ],
+
+        
+        setConfig: function(key, value){
+          this.config[key] = value;
+          localStorage.setItem(PLAYER_STRORAGE_KEY, JSON.stringify(this.config))
+        },
+
+        //  render
+        render: function () {
+          const htmls = this.songs.map((song, index) => {
+            //lap qua tùng tp cua mang
+            return `
+                 <div class="song ${
+                   index === this.currentIndex ? "active" : ""
+                 }" data-index="${index}">
+                     <div class="thumb" style="background-image: url('${
+                       song.image
+                     }')">
+                    </div>
+                        <div class="body">
+                      <h3 class="title">${song.name}</h3>
+                     <p class="author">${song.singer}</p>
+                      </div>
+                      <div class="option">
+                      <i class="fas fa-ellipsis-h"></i>
+                       </div>
+                 </div>
+                    `;
+          });
+          playList.innerHTML = htmls.join("");
+        },
+        defineProperties: function () {
+          Object.defineProperty(this, "currentSong", {
+            get: function () {
+              return this.songs[this.currentIndex];
+            },
+          });
+        },
+        handleEvents: function () {
+          const cdWidth = cd.offsetWidth;
+          const _this = this;
+
+          //xu li cd quay
+          const cdThumbAnimate = cdThumb.animate(
+            [{ transform: "rotate(360deg)" }],
+            {
+              duration: 10000, //10s
+              iterations: Infinity,
+            }
+          );
+          cdThumbAnimate.pause();
+
+          //  xu li scroll
+          document.onscroll = function () {
+            const scrollTop =
+              document.documentElement.scrollTop || window.scrollY;
+            const newWidth = cdWidth - scrollTop;
+
+            cd.style.width = newWidth > 0 ? newWidth + "px" : 0;
+            cd.style.opacity = newWidth / cdWidth;
+          };
+
+          //xu li play click pause
+          playBtn.onclick = function () {
+            if (_this.isPlaying) {
+              audio.pause();
+            } else {
+              audio.play();
+            }
+          };
+
+          /// khi song duoc play thi
+          audio.onplay = function () {
+            _this.isPlaying = true;
+            player.classList.add("playing");
+            cdThumbAnimate.play();
+          };
+
+          // khi song pause thi
+          audio.onpause = function () {
+            _this.isPlaying = false;
+            player.classList.remove("playing");
+            cdThumbAnimate.pause();
+          };
+
+          // thoi gian bai hat
+          audio.ontimeupdate = function () {
+            if (audio.duration) {
+              const progressPercent = Math.floor(
+                (audio.currentTime / audio.duration) * 100
+              );
+              progerss.value = progressPercent;
+            }
+          };
+
+          //  tua nhac
+          progerss.onchange = function (e) {
+            const seekTime = (audio.duration / 100) * e.target.value;
+            audio.currentTime = seekTime;
+          };
+
+          //next bai hat
+          nextBtn.onclick = function () {
+            if (_this.isRandom) {
+              _this.playRandom();
+            } else {
+              _this.nextSong();
+            }
+            audio.play();
+            _this.render();
+            _this.scrollActiveSong();
+          };
+
+          //quay lai bai hat\
+          prevBtn.onclick = function () {
+            if (_this.isRandom) {
+              _this.playRandom();
+            } else {
+              _this.prevSong();
+            }
+            audio.play();
+          };
+          // console.log(prevBtn)
+
+          //bat/ta random bai hat
+          randomBtn.onclick = function (e) {
+            _this.isRandom = !_this.isRandom;
+            _this.setConfig('isRandom',_this.isRandom)
+            randomBtn.classList.toggle("active", _this.isRandom);
+          };
+
+           //xu li phat lai  mot bai hat
+           repeatBtn.onclick = function (e) {
+            _this.isRepeat = !_this.isRepeat;
+            _this.setConfig('isRepeat',_this.isRepeat)
+            repeatBtn.classList.toggle("active", _this.isRepeat);
+          };
+
+          // xu li next song audio ended
+          audio.onended = function () {
+            if (_this.isRepeat) {
+              audio.play();
+            } else {
+              nextBtn.click();
+            }
+          };
+
+          //listen when click
+          playList.onclick = function (e) {
+            const songNode = e.target.closest('.song:not(.active)')
+              const songOption = e.target.closest('.option')
+
+            if( songNode|| songOption){
+              
+              //xu li click vao song
+                if(songNode){
+
+                _this.currentIndex = Number(songNode.dataset.index)
+                _this.loadCurrentSong()
+                audio.play()
+                _this.render()
+
+                }
+
+                //xu li khi lich vaof option
+                if(e.target.closest('.option')){
+
+                  //code
+
+                }
+            }
+          };
+
+         
+        },
+        loadCurrentSong: function () {
+          heading.textContent = this.currentSong.name;
+          cdThumb.style.background = `url('${this.currentSong.image}')`;
+          audio.src = this.currentSong.path;
+        },
+        loadConfig: function(){
+          this.isRandom = this.config.isRandom
+          this.isRepeat = this.config.isRepeat
+        },
+
+        // ham next baui het
+        nextSong() {
+          this.currentIndex++;
+          if (this.currentIndex >= this.songs.length) {
+            this.currentIndex = 0;
+          }
+          this.loadCurrentSong();
+        },
+
+        // ham quay lai nbai hat
+        prevSong() {
+          this.currentIndex--;
+          if (this.currentIndex < 0) {
+            this.currentIndex = this.songs.length - 1;
+          }
+          this.loadCurrentSong();
+        },
+
+        // random bai hat
+        playRandom: function () {
+          let newIndex;
+          do {
+            newIndex = Math.floor(Math.random() * this.songs.length);
+          } while (newIndex === this.currentIndex);
+
+          this.currentIndex = newIndex;
+          this.loadCurrentSong();
+        },
+        scrollActiveSong: function () {
+          setTimeout(() => {
+            $(".song.active").scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }, 500);
+        },
+
+
+
+        start: function () {
+          //load config
+          this.loadConfig()
+          //định nghĩa các thuộc tiunhs cho Oject
+          this.defineProperties();
+
+          //Lắn nghe các sự kiện
+          this.handleEvents();
+
+          //tai thong n bai hat dau tien
+          this.loadCurrentSong();
+
+          //render danh sách ài hát(play list)
+          this.render();
+
+
+          //hien thi lua chon trc do
+          randomBtn.classList.toggle("active", this.israndom); 
+          repeatBtn.classList.toggle("active", this.isRepeat);
+        },
+      };
+
+      app.start();
+    </script>
+  </body>
+</html>
